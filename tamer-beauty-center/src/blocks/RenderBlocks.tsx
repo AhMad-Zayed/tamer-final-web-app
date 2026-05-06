@@ -7,6 +7,9 @@ import { CallToActionBlock } from '@/blocks/CallToAction/Component'
 import { ContentBlock } from '@/blocks/Content/Component'
 import { FormBlock } from '@/blocks/Form/Component'
 import { MediaBlock } from '@/blocks/MediaBlock/Component'
+import { ExpertsOrbitBlock } from '@/blocks/ExpertsOrbit/Component'
+import { ServicesGridBlock } from '@/blocks/ServicesGrid/Component'
+import { OffersBlockComponent } from '@/blocks/OffersBlock/Component'
 
 const blockComponents = {
   archive: ArchiveBlock,
@@ -14,6 +17,9 @@ const blockComponents = {
   cta: CallToActionBlock,
   formBlock: FormBlock,
   mediaBlock: MediaBlock,
+  expertsOrbit: ExpertsOrbitBlock,
+  servicesGrid: ServicesGridBlock,
+  offersBlock: OffersBlockComponent,
 }
 
 export const RenderBlocks: React.FC<{
@@ -30,7 +36,7 @@ export const RenderBlocks: React.FC<{
           const { blockType } = block
 
           if (blockType && blockType in blockComponents) {
-            const Block = blockComponents[blockType]
+            const Block = blockComponents[blockType as keyof typeof blockComponents]
 
             if (Block) {
               return (

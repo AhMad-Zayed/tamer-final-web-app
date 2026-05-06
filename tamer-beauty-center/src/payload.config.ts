@@ -59,7 +59,7 @@ export default buildConfig({
   editor: defaultLexical,
   db: postgresAdapter({
     pool: {
-      connectionString: process.env.DATABASE_URL || '',
+      connectionString: "postgresql://postgres:password123@127.0.0.1:5432/postgres",
     },
   }),
   collections: [Pages, Posts, Media, Categories, Users],

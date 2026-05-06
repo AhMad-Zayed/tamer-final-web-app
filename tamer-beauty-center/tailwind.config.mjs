@@ -1,48 +1,37 @@
 /** @type {import('tailwindcss').Config} */
-const config = {
+export default {
   theme: {
     extend: {
-      typography: {
-        DEFAULT: {
-          css: [
-            {
-              '--tw-prose-body': 'var(--text)',
-              '--tw-prose-headings': 'var(--text)',
-              h1: {
-                fontWeight: 'normal',
-                marginBottom: '0.25em',
-              },
-            },
-          ],
+      colors: {
+        background: '#131313',
+        surface: '#131313',
+        'surface-container-low': '#1c1b1b',
+        'surface-container-highest': '#353535',
+        primary: {
+          DEFAULT: '#ffffff',
+          neon: '#c3f400', // Electric Lime
         },
-        base: {
-          css: [
-            {
-              h1: {
-                fontSize: '2.5rem',
-              },
-              h2: {
-                fontSize: '1.25rem',
-                fontWeight: 600,
-              },
-            },
-          ],
+        secondary: {
+          DEFAULT: '#e9c349', // Luxury Gold
         },
-        md: {
-          css: [
-            {
-              h1: {
-                fontSize: '3.5rem',
-              },
-              h2: {
-                fontSize: '1.5rem',
-              },
-            },
-          ],
-        },
+        tertiary: '#f4bb92', // Wood Tones
+        outline: {
+          variant: 'rgba(68, 73, 51, 0.15)', // Ghost Border
+        }
       },
+      fontFamily: {
+        display: ['Epilogue', 'sans-serif'], // Editorial Authority
+        sans: ['Manrope', 'sans-serif'],    // Clinical Precision
+        mono: ['Inter', 'sans-serif'],      // Technical Labels
+      },
+      borderRadius: {
+        'xl': '0.75rem',
+        'lg': '0.5rem',
+      },
+      boxShadow: {
+        'neon-glow': '0 0 15px rgba(195, 244, 0, 0.4)', // Neon Sanctuary Glow
+      }
     },
   },
-}
 
-export default config
+}

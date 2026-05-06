@@ -4,11 +4,11 @@
 @config '../../../tailwind.config.mjs';
 
 @custom-variant dark (&:is([data-theme='dark'] *));
-@custom-variant sm (@media (width >= theme(--breakpoint-sm)));
-@custom-variant md (@media (width >= theme(--breakpoint-md)));
-@custom-variant lg (@media (width >= theme(--breakpoint-lg)));
-@custom-variant xl (@media (width >= theme(--breakpoint-xl)));
-@custom-variant 2xl (@media (width >= theme(--breakpoint-2xl)));
+@custom-variant sm (@media (width >=theme(--breakpoint-sm)));
+@custom-variant md (@media (width >=theme(--breakpoint-md)));
+@custom-variant lg (@media (width >=theme(--breakpoint-lg)));
+@custom-variant xl (@media (width >=theme(--breakpoint-xl)));
+@custom-variant 2xl (@media (width >=theme(--breakpoint-2xl)));
 
 @layer base {
   h1,
@@ -47,42 +47,30 @@
   --font-sans: var(--font-geist-sans);
 }
 
-@layer utilities {
-  .container {
-    width: 100%;
-    margin-inline: auto;
-    padding-inline: 1rem;
+@layer base {
+  body {
+    @apply bg-background text-white font-sans antialiased;
   }
 
-  @variant sm {
-    .container {
-      max-width: var(--breakpoint-sm);
-    }
+  h1,
+  h2,
+  h3,
+  h4 {
+    @apply font-display tracking-tighter;
+  }
+}
+
+@layer components {
+  .glass-card {
+    @apply bg-surface-container-low/40 backdrop-blur-[20px] border-none;
   }
 
-  @variant md {
-    .container {
-      max-width: var(--breakpoint-md);
-      padding-inline: 2rem;
-    }
+  .neon-button {
+    @apply bg-primary-neon text-[#283500] font-bold py-3 px-6 rounded-xl transition-all duration-300 hover:shadow-neon-glow;
   }
 
-  @variant lg {
-    .container {
-      max-width: var(--breakpoint-lg);
-    }
-  }
-
-  @variant xl {
-    .container {
-      max-width: var(--breakpoint-xl);
-    }
-  }
-
-  @variant 2xl {
-    .container {
-      max-width: var(--breakpoint-2xl);
-    }
+  .clinical-input {
+    @apply bg-transparent border-b-2 border-outline-variant outline-none focus:border-primary-neon transition-colors duration-300;
   }
 }
 
@@ -203,12 +191,23 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-error: var(--error);
+
+  /* ── Neon Sanctuary Design Tokens ── */
+  --color-surface-container-low: #1c1b1b;
+  --color-primary-neon: #c3f400;
+  --color-outline-variant: rgba(68, 73, 51, 0.15);
+  --color-background: #131313;
+  --shadow-neon-glow: 0 0 15px rgba(195, 244, 0, 0.4);
+  --font-display: 'Epilogue', sans-serif;
+  --font-sans: 'Manrope', sans-serif;
+  --font-mono: 'Inter', sans-serif;
 }
 
 @layer base {
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground min-h-[100vh] flex flex-col;
   }

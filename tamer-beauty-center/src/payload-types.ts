@@ -201,7 +201,16 @@ export interface Page {
       | null;
     media?: (number | null) | Media;
   };
-  layout: (CallToActionBlock | ContentBlock | MediaBlock | ArchiveBlock | FormBlock)[];
+  layout: (
+    | CallToActionBlock
+    | ContentBlock
+    | MediaBlock
+    | ArchiveBlock
+    | FormBlock
+    | ExpertsOrbitBlock
+    | ServicesGridBlock
+    | OffersBlock
+  )[];
   meta?: {
     title?: string | null;
     /**
@@ -783,6 +792,73 @@ export interface Form {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ExpertsOrbitBlock".
+ */
+export interface ExpertsOrbitBlock {
+  heading?: string | null;
+  subheading?: string | null;
+  centerImage: number | Media;
+  experts?:
+    | {
+        name: string;
+        title?: string | null;
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'expertsOrbit';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesGridBlock".
+ */
+export interface ServicesGridBlock {
+  heading?: string | null;
+  subheading?: string | null;
+  services?:
+    | {
+        title: string;
+        description?: string | null;
+        image?: (number | null) | Media;
+        size?: ('wide' | 'small' | 'full') | null;
+        tag?: string | null;
+        link?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'servicesGrid';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OffersBlock".
+ */
+export interface OffersBlock {
+  heading?: string | null;
+  subheading?: string | null;
+  offers?:
+    | {
+        title: string;
+        description?: string | null;
+        image?: (number | null) | Media;
+        oldPrice?: number | null;
+        newPrice: number;
+        currency?: string | null;
+        limitedTag?: string | null;
+        expiryDate?: string | null;
+        link?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  id?: string | null;
+  blockName?: string | null;
+  blockType: 'offersBlock';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "redirects".
  */
 export interface Redirect {
@@ -1089,6 +1165,9 @@ export interface PagesSelect<T extends boolean = true> {
         mediaBlock?: T | MediaBlockSelect<T>;
         archive?: T | ArchiveBlockSelect<T>;
         formBlock?: T | FormBlockSelect<T>;
+        expertsOrbit?: T | ExpertsOrbitBlockSelect<T>;
+        servicesGrid?: T | ServicesGridBlockSelect<T>;
+        offersBlock?: T | OffersBlockSelect<T>;
       };
   meta?:
     | T
@@ -1185,6 +1264,70 @@ export interface FormBlockSelect<T extends boolean = true> {
   form?: T;
   enableIntro?: T;
   introContent?: T;
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ExpertsOrbitBlock_select".
+ */
+export interface ExpertsOrbitBlockSelect<T extends boolean = true> {
+  heading?: T;
+  subheading?: T;
+  centerImage?: T;
+  experts?:
+    | T
+    | {
+        name?: T;
+        title?: T;
+        image?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "ServicesGridBlock_select".
+ */
+export interface ServicesGridBlockSelect<T extends boolean = true> {
+  heading?: T;
+  subheading?: T;
+  services?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        size?: T;
+        tag?: T;
+        link?: T;
+        id?: T;
+      };
+  id?: T;
+  blockName?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "OffersBlock_select".
+ */
+export interface OffersBlockSelect<T extends boolean = true> {
+  heading?: T;
+  subheading?: T;
+  offers?:
+    | T
+    | {
+        title?: T;
+        description?: T;
+        image?: T;
+        oldPrice?: T;
+        newPrice?: T;
+        currency?: T;
+        limitedTag?: T;
+        expiryDate?: T;
+        link?: T;
+        id?: T;
+      };
   id?: T;
   blockName?: T;
 }
