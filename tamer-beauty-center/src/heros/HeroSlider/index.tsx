@@ -46,28 +46,28 @@ export const HeroSlider: React.FC<Page['hero']> = ({ slides }) => {
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
           key={`text-${currentSlide}`}
-          initial={{ opacity: 0, x: 70 }}
+          initial={{ opacity: 0, x: 50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.5, delay: 0.4 }}
         >
-          <span className="text-[#c3f400] font-bold tracking-[0.6em] text-sm mb-8 block uppercase">
+          <span className="text-[#c3f400] font-semibold tracking-[0.4em] text-xs md:text-sm mb-6 block uppercase">
             — THE NEON SANCTUARY
           </span>
-          <h1 className="text-7xl md:text-[11rem] font-black leading-[0.85] mb-12 tracking-tighter text-white">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold leading-tight mb-8 tracking-tight text-white drop-shadow-xl">
             {activeSlide.title} <br />
             {activeSlide.subtitle && (
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/20 italic">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white to-white/40 italic font-medium">
                 {activeSlide.subtitle}
               </span>
             )}
           </h1>
           {activeSlide.desc && (
-            <p className="text-neutral-400 max-w-3xl text-2xl md:text-3xl mb-14 leading-tight border-r-4 border-[#c3f400] pr-10">
+            <p className="text-neutral-300 max-w-2xl text-lg md:text-xl mb-10 leading-relaxed border-r-2 border-[#c3f400] pr-6 font-medium">
               {activeSlide.desc}
             </p>
           )}
-          <button className="bg-[#c3f400] text-black px-16 py-7 rounded-3xl font-black text-3xl hover:scale-105 transition-all shadow-2xl shadow-[#c3f400]/30 flex items-center gap-6">
-            ابدأ رحلتك <ArrowRight size={40} />
+          <button className="bg-[#c3f400] text-black px-10 py-4 rounded-full font-bold text-lg hover:scale-105 transition-all shadow-lg shadow-[#c3f400]/20 flex items-center gap-4">
+            ابدأ رحلتك <ArrowRight size={24} />
           </button>
         </motion.div>
       </div>

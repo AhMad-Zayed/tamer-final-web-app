@@ -43,17 +43,17 @@ export const ServicesGridBlock: React.FC<ServicesGridBlockProps> = ({
   const cards = services ?? []
 
   return (
-    <section className="container py-24">
+    <section className="container py-16 md:py-24">
       {/* ── Section header ── */}
       {(heading || subheading) && (
         <div className="mb-12" dir="rtl">
           {heading && (
-            <h2 className="font-display text-4xl md:text-5xl tracking-tighter text-white mb-3">
+            <h2 className="font-display text-4xl md:text-5xl font-bold tracking-tight text-white mb-3 drop-shadow-md">
               {heading}
             </h2>
           )}
           {subheading && (
-            <p className="text-white/60 text-lg max-w-xl">{subheading}</p>
+            <p className="text-white/60 text-lg max-w-xl font-medium">{subheading}</p>
           )}
         </div>
       )}
