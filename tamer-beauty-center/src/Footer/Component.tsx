@@ -10,7 +10,7 @@ const NAV_LINKS = [
   { label: 'المتجر', href: '#store' },
 ]
 
-export async function Footer() {
+export function Footer() {
   return (
     <footer
       className="relative mt-auto overflow-hidden"

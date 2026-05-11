@@ -5,6 +5,10 @@ import { authenticated } from '../../access/authenticated'
 
 export const Experts: CollectionConfig = {
   slug: 'experts',
+  labels: {
+    singular: 'موظف (Employee)',
+    plural: 'الموظفون (Employees)',
+  },
   access: {
     create: authenticated,
     delete: authenticated,
@@ -14,6 +18,7 @@ export const Experts: CollectionConfig = {
   admin: {
     defaultColumns: ['name', 'title', 'updatedAt'],
     useAsTitle: 'name',
+    group: 'إدارة المركز',
   },
   fields: [
     {
@@ -63,32 +68,96 @@ export const Experts: CollectionConfig = {
       },
     },
     {
-      name: 'image',
-      type: 'upload',
-      relationTo: 'media',
-      required: true,
-      admin: {
-        description: 'Profile image for the expert.',
-      },
-    },
-    {
-      name: 'gallery',
-      type: 'array',
-      admin: {
-        description: 'Portfolio gallery for this expert.',
-      },
+      name: 'profileMedia',
+      label: 'الوسائط الشخصية (Profile Media)',
+      type: 'group',
       fields: [
+        {
+          name: 'type',
+          type: 'radio',
+          options: [
+            { label: 'صورة', value: 'image' },
+            { label: 'فيديو (رفع)', value: 'video' },
+            { label: 'رابط فيديو خارجي', value: 'videoUrl' },
+          ],
+          defaultValue: 'image',
+        },
         {
           name: 'image',
           type: 'upload',
           relationTo: 'media',
-          required: true,
+          admin: {
+            condition: (_, siblingData) => siblingData?.type === 'image',
+          },
+        },
+        {
+          name: 'video',
+          type: 'upload',
+          relationTo: 'media',
+          admin: {
+            condition: (_, siblingData) => siblingData?.type === 'video',
+          },
+        },
+        {
+          name: 'videoUrl',
+          type: 'text',
+          admin: {
+            condition: (_, siblingData) => siblingData?.type === 'videoUrl',
+            description: 'ضع رابط فيديو من يوتيوب أو فيميو (يجب أن يكون رابط Embed)',
+          },
+        },
+      ],
+    },
+    {
+      name: 'speech',
+      label: 'كلمة الخبير (Speech)',
+      type: 'richText',
+    },
+    {
+      name: 'gallery',
+      label: 'معرض الأعمال (Gallery)',
+      type: 'array',
+      fields: [
+        {
+          name: 'type',
+          type: 'radio',
+          options: [
+            { label: 'صورة', value: 'image' },
+            { label: 'فيديو (رفع)', value: 'video' },
+            { label: 'رابط فيديو خارجي', value: 'videoUrl' },
+          ],
+          defaultValue: 'image',
+        },
+        {
+          name: 'image',
+          type: 'upload',
+          relationTo: 'media',
+          admin: { condition: (_, siblingData) => siblingData?.type === 'image' },
+        },
+        {
+          name: 'video',
+          type: 'upload',
+          relationTo: 'media',
+          admin: { condition: (_, siblingData) => siblingData?.type === 'video' },
+        },
+        {
+          name: 'videoUrl',
+          type: 'text',
+          admin: { condition: (_, siblingData) => siblingData?.type === 'videoUrl' },
         },
         {
           name: 'caption',
+          label: 'الوصف (Caption)',
           type: 'text',
         },
       ],
+    },
+    {
+      name: 'reviews',
+      label: 'آراء العملاء (Reviews)',
+      type: 'relationship',
+      relationTo: 'reviews',
+      hasMany: true,
     },
   ],
 }

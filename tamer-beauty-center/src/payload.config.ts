@@ -11,6 +11,7 @@ import { Posts } from './collections/Posts'
 import { Users } from './collections/Users'
 import { Footer } from './Footer/config'
 import { Header } from './Header/config'
+import { About } from './globals/About/config'
 import { plugins } from './plugins'
 import { defaultLexical } from '@/fields/defaultLexical'
 import { getServerSideURL } from './utilities/getURL'
@@ -19,6 +20,11 @@ import { Experts } from './collections/Experts'
 import { Services } from './collections/Services'
 import { Offers } from './collections/Offers'
 import { Reviews } from './collections/Reviews'
+import { Products } from './collections/Products'
+import { Coupons } from './collections/Coupons'
+import { Orders } from './collections/Orders'
+import { ShippingZones } from './collections/ShippingZones'
+import { ProductCategories } from './collections/ProductCategories'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -47,9 +53,24 @@ export default buildConfig({
       connectionString: "postgresql://postgres:password123@127.0.0.1:5432/postgres",
     },
   }),
-  collections: [Pages, Posts, Media, Categories, Users, Experts, Services, Offers, Reviews],
+  collections: [
+    Pages,
+    Posts,
+    Media,
+    Categories,
+    Users,
+    Experts,
+    Services,
+    Offers,
+    Reviews,
+    Products,
+    Coupons,
+    Orders,
+    ShippingZones,
+    ProductCategories,
+  ],
   cors: [getServerSideURL()].filter(Boolean),
-  globals: [Header, Footer],
+  globals: [Header, Footer, About],
   plugins,
   secret: process.env.PAYLOAD_SECRET,
   sharp,

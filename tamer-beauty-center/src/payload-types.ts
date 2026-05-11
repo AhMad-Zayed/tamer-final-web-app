@@ -76,6 +76,11 @@ export interface Config {
     services: Service;
     offers: Offer;
     reviews: Review;
+    products: Product;
+    coupons: Coupon;
+    orders: Order;
+    'shipping-zones': ShippingZone;
+    'product-categories': ProductCategory;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -102,6 +107,11 @@ export interface Config {
     services: ServicesSelect<false> | ServicesSelect<true>;
     offers: OffersSelect<false> | OffersSelect<true>;
     reviews: ReviewsSelect<false> | ReviewsSelect<true>;
+    products: ProductsSelect<false> | ProductsSelect<true>;
+    coupons: CouponsSelect<false> | CouponsSelect<true>;
+    orders: OrdersSelect<false> | OrdersSelect<true>;
+    'shipping-zones': ShippingZonesSelect<false> | ShippingZonesSelect<true>;
+    'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -120,10 +130,12 @@ export interface Config {
   globals: {
     header: Header;
     footer: Footer;
+    about: About;
   };
   globalsSelect: {
     header: HeaderSelect<false> | HeaderSelect<true>;
     footer: FooterSelect<false> | FooterSelect<true>;
+    about: AboutSelect<false> | AboutSelect<true>;
   };
   locale: null;
   widgets: {
@@ -850,20 +862,64 @@ export interface Expert {
    * Years of experience in the field.
    */
   experienceYears: number;
-  /**
-   * Profile image for the expert.
-   */
-  image: number | Media;
-  /**
-   * Portfolio gallery for this expert.
-   */
+  profileMedia?: {
+    type?: ('image' | 'video' | 'videoUrl') | null;
+    image?: (number | null) | Media;
+    video?: (number | null) | Media;
+    /**
+     * ضع رابط فيديو من يوتيوب أو فيميو (يجب أن يكون رابط Embed)
+     */
+    videoUrl?: string | null;
+  };
+  speech?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
   gallery?:
     | {
-        image: number | Media;
+        type?: ('image' | 'video' | 'videoUrl') | null;
+        image?: (number | null) | Media;
+        video?: (number | null) | Media;
+        videoUrl?: string | null;
         caption?: string | null;
         id?: string | null;
       }[]
     | null;
+  reviews?: (number | Review)[] | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "reviews".
+ */
+export interface Review {
+  id: number;
+  /**
+   * Name of the reviewer.
+   */
+  name: string;
+  /**
+   * Service received (e.g., ليزر, تجهيز عريس).
+   */
+  service?: string | null;
+  rating: number;
+  text: string;
+  /**
+   * Only published reviews will appear on the site.
+   */
+  status?: ('draft' | 'published') | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -957,18 +1013,12 @@ export interface Service {
   id: number;
   title: string;
   slug?: string | null;
-  category: 'laser' | 'skin' | 'hair' | 'other';
+  category: 'laser' | 'skin' | 'hair' | 'wellness' | 'vip';
   /**
-   * Lucide React icon name (e.g., Activity, Smile, Scissors, Gem)
+   * اسم أيقونة Lucide (مثل: Zap, Scissors, Heart, Crown)
    */
   icon?: string | null;
-  /**
-   * Displayed on the home page service card.
-   */
   shortDescription: string;
-  /**
-   * Detailed description for the service landing page.
-   */
   fullDescription?: {
     root: {
       type: string;
@@ -984,21 +1034,69 @@ export interface Service {
     };
     [k: string]: unknown;
   } | null;
-  /**
-   * Starting price (e.g. 200, or "تبدأ من 50")
-   */
-  basePrice?: string | null;
-  currency?: string | null;
-  /**
-   * Optional sub-packages or specific parts (e.g. Full body, Half body)
-   */
+  coverImage?: (number | null) | Media;
   packages?:
     | {
-        name: string;
+        label: string;
+        /**
+         * سيتم استخدام هذا الرابط لإنشاء صفحة خاصة لهذه الباقة (مثلاً: full-body-laser)
+         */
+        slug: string;
         price: string;
+        note?: string | null;
+        fullDescription?: {
+          root: {
+            type: string;
+            children: {
+              type: any;
+              version: number;
+              [k: string]: unknown;
+            }[];
+            direction: ('ltr' | 'rtl') | null;
+            format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+            indent: number;
+            version: number;
+          };
+          [k: string]: unknown;
+        } | null;
+        media?:
+          | {
+              type?: ('image' | 'video' | 'videoUrl') | null;
+              image?: (number | null) | Media;
+              video?: (number | null) | Media;
+              videoUrl?: string | null;
+              id?: string | null;
+            }[]
+          | null;
+        faqs?:
+          | {
+              question: string;
+              answer: string;
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
+  faqs?:
+    | {
+        question: string;
+        answer: string;
+        id?: string | null;
+      }[]
+    | null;
+  beforeAfterGallery?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * إذا كانت هناك صفقة محدودة، أدخل تاريخ الانتهاء هنا
+   */
+  expiryDate?: string | null;
+  isFeatured?: boolean | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1095,29 +1193,6 @@ export interface ReviewsBlockBlock {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "reviews".
- */
-export interface Review {
-  id: number;
-  /**
-   * Name of the reviewer.
-   */
-  name: string;
-  /**
-   * Service received (e.g., ليزر, تجهيز عريس).
-   */
-  service?: string | null;
-  rating: number;
-  text: string;
-  /**
-   * Only published reviews will appear on the site.
-   */
-  status?: ('draft' | 'published') | null;
-  updatedAt: string;
-  createdAt: string;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "LocationContactBlock".
  */
 export interface LocationContactBlock {
@@ -1135,6 +1210,133 @@ export interface LocationContactBlock {
   id?: string | null;
   blockName?: string | null;
   blockType: 'locationContact';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products".
+ */
+export interface Product {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  price: number;
+  salePrice?: number | null;
+  stock: number;
+  category: number | ProductCategory;
+  imageGallery?:
+    | {
+        image: number | Media;
+        id?: string | null;
+      }[]
+    | null;
+  description?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  variants?:
+    | {
+        label: string;
+        type?: ('size' | 'type' | 'color') | null;
+        additionalPrice?: number | null;
+        id?: string | null;
+      }[]
+    | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories".
+ */
+export interface ProductCategory {
+  id: number;
+  title: string;
+  /**
+   * When enabled, the slug will auto-generate from the title field on save and autosave.
+   */
+  generateSlug?: boolean | null;
+  slug: string;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coupons".
+ */
+export interface Coupon {
+  id: number;
+  code: string;
+  discountType: 'percentage' | 'fixed';
+  value: number;
+  expiryDate?: string | null;
+  maxUses?: number | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders".
+ */
+export interface Order {
+  id: number;
+  orderNumber?: string | null;
+  status: 'pending' | 'confirmed' | 'shipped' | 'delivered' | 'cancelled';
+  customerInfo: {
+    name: string;
+    phone: string;
+    shippingAddress: string;
+    shippingZone: number | ShippingZone;
+  };
+  items: {
+    product: number | Product;
+    quantity: number;
+    priceAtPurchase: number;
+    id?: string | null;
+  }[];
+  totals: {
+    subtotal: number;
+    shippingCost: number;
+    discount?: number | null;
+    total: number;
+  };
+  gifting?: {
+    isGift?: boolean | null;
+    recipientName?: string | null;
+    giftMessage?: string | null;
+    luxuryWrapping?: boolean | null;
+  };
+  payment: 'cod';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shipping-zones".
+ */
+export interface ShippingZone {
+  id: number;
+  name: string;
+  deliveryPrice: number;
+  estimatedDeliveryTime?: string | null;
+  active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -1361,6 +1563,26 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'reviews';
         value: number | Review;
+      } | null)
+    | ({
+        relationTo: 'products';
+        value: number | Product;
+      } | null)
+    | ({
+        relationTo: 'coupons';
+        value: number | Coupon;
+      } | null)
+    | ({
+        relationTo: 'orders';
+        value: number | Order;
+      } | null)
+    | ({
+        relationTo: 'shipping-zones';
+        value: number | ShippingZone;
+      } | null)
+    | ({
+        relationTo: 'product-categories';
+        value: number | ProductCategory;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -1917,14 +2139,26 @@ export interface ExpertsSelect<T extends boolean = true> {
   title?: T;
   bio?: T;
   experienceYears?: T;
-  image?: T;
+  profileMedia?:
+    | T
+    | {
+        type?: T;
+        image?: T;
+        video?: T;
+        videoUrl?: T;
+      };
+  speech?: T;
   gallery?:
     | T
     | {
+        type?: T;
         image?: T;
+        video?: T;
+        videoUrl?: T;
         caption?: T;
         id?: T;
       };
+  reviews?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1939,15 +2173,49 @@ export interface ServicesSelect<T extends boolean = true> {
   icon?: T;
   shortDescription?: T;
   fullDescription?: T;
-  basePrice?: T;
-  currency?: T;
+  coverImage?: T;
   packages?:
     | T
     | {
-        name?: T;
+        label?: T;
+        slug?: T;
         price?: T;
+        note?: T;
+        fullDescription?: T;
+        media?:
+          | T
+          | {
+              type?: T;
+              image?: T;
+              video?: T;
+              videoUrl?: T;
+              id?: T;
+            };
+        faqs?:
+          | T
+          | {
+              question?: T;
+              answer?: T;
+              id?: T;
+            };
         id?: T;
       };
+  faqs?:
+    | T
+    | {
+        question?: T;
+        answer?: T;
+        id?: T;
+      };
+  beforeAfterGallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  expiryDate?: T;
+  isFeatured?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1980,6 +2248,116 @@ export interface ReviewsSelect<T extends boolean = true> {
   rating?: T;
   text?: T;
   status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "products_select".
+ */
+export interface ProductsSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
+  price?: T;
+  salePrice?: T;
+  stock?: T;
+  category?: T;
+  imageGallery?:
+    | T
+    | {
+        image?: T;
+        id?: T;
+      };
+  description?: T;
+  variants?:
+    | T
+    | {
+        label?: T;
+        type?: T;
+        additionalPrice?: T;
+        id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "coupons_select".
+ */
+export interface CouponsSelect<T extends boolean = true> {
+  code?: T;
+  discountType?: T;
+  value?: T;
+  expiryDate?: T;
+  maxUses?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "orders_select".
+ */
+export interface OrdersSelect<T extends boolean = true> {
+  orderNumber?: T;
+  status?: T;
+  customerInfo?:
+    | T
+    | {
+        name?: T;
+        phone?: T;
+        shippingAddress?: T;
+        shippingZone?: T;
+      };
+  items?:
+    | T
+    | {
+        product?: T;
+        quantity?: T;
+        priceAtPurchase?: T;
+        id?: T;
+      };
+  totals?:
+    | T
+    | {
+        subtotal?: T;
+        shippingCost?: T;
+        discount?: T;
+        total?: T;
+      };
+  gifting?:
+    | T
+    | {
+        isGift?: T;
+        recipientName?: T;
+        giftMessage?: T;
+        luxuryWrapping?: T;
+      };
+  payment?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "shipping-zones_select".
+ */
+export interface ShippingZonesSelect<T extends boolean = true> {
+  name?: T;
+  deliveryPrice?: T;
+  estimatedDeliveryTime?: T;
+  active?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "product-categories_select".
+ */
+export interface ProductCategoriesSelect<T extends boolean = true> {
+  title?: T;
+  generateSlug?: T;
+  slug?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -2281,6 +2659,26 @@ export interface Header {
           url?: string | null;
           label: string;
         };
+        subItems?:
+          | {
+              link: {
+                type?: ('reference' | 'custom') | null;
+                newTab?: boolean | null;
+                reference?:
+                  | ({
+                      relationTo: 'pages';
+                      value: number | Page;
+                    } | null)
+                  | ({
+                      relationTo: 'posts';
+                      value: number | Post;
+                    } | null);
+                url?: string | null;
+                label: string;
+              };
+              id?: string | null;
+            }[]
+          | null;
         id?: string | null;
       }[]
     | null;
@@ -2318,6 +2716,70 @@ export interface Footer {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about".
+ */
+export interface About {
+  id: number;
+  title: string;
+  tamerBio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  tamerVision?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  centerBio?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  tamerMedia?: {
+    type?: ('image' | 'video' | 'videoUrl') | null;
+    image?: (number | null) | Media;
+    video?: (number | null) | Media;
+    /**
+     * ضع رابط فيديو من يوتيوب أو فيميو (يجب أن يكون رابط Embed)
+     */
+    videoUrl?: string | null;
+  };
+  updatedAt?: string | null;
+  createdAt?: string | null;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "header_select".
  */
 export interface HeaderSelect<T extends boolean = true> {
@@ -2332,6 +2794,20 @@ export interface HeaderSelect<T extends boolean = true> {
               reference?: T;
               url?: T;
               label?: T;
+            };
+        subItems?:
+          | T
+          | {
+              link?:
+                | T
+                | {
+                    type?: T;
+                    newTab?: T;
+                    reference?: T;
+                    url?: T;
+                    label?: T;
+                  };
+              id?: T;
             };
         id?: T;
       };
@@ -2357,6 +2833,27 @@ export interface FooterSelect<T extends boolean = true> {
               label?: T;
             };
         id?: T;
+      };
+  updatedAt?: T;
+  createdAt?: T;
+  globalType?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "about_select".
+ */
+export interface AboutSelect<T extends boolean = true> {
+  title?: T;
+  tamerBio?: T;
+  tamerVision?: T;
+  centerBio?: T;
+  tamerMedia?:
+    | T
+    | {
+        type?: T;
+        image?: T;
+        video?: T;
+        videoUrl?: T;
       };
   updatedAt?: T;
   createdAt?: T;

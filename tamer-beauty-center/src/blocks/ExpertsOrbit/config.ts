@@ -33,7 +33,7 @@ export const ExpertsOrbit: Block = {
       hasMany: true,
       required: true,
       minRows: 3,
-      maxRows: 6,
+      maxRows: 20,
       admin: {
         description: 'Select the experts to showcase in the orbit.',
       },

@@ -1,68 +1,47 @@
 'use client'
 import React, { useState } from 'react'
 import Image from 'next/image'
+import Link from 'next/link'
+import { useCart } from '@/providers/CartProvider/store'
+import type { Product, ShippingZone, Media, ProductCategory } from '@/payload-types'
 
-const CATEGORIES = [
-  'جميع المنتجات',
-  'عناية الوجه',
-  'عناية الجسم',
-  'صحة القدمين',
-  'علاجات الشعر',
-  'عطور نادرة',
-  'إكسسوارات فاخرة',
-]
+interface Props {
+  initialProducts: Product[]
+  initialShippingZones: ShippingZone[]
+  initialCategories: ProductCategory[]
+}
 
-const PRODUCTS = [
-  {
-    id: 1,
-    name: 'سيروم التجديد الخلوي',
-    category: 'إصدار حصري',
-    description: 'تركيبة غنية بالببتيدات النشطة لترميم طبقات الجلد العميقة وتعزيز النضارة.',
-    price: '245.00',
-    currency: 'ر.س',
-    image: '/store-serum.png',
-    isFeatured: true,
-  },
-  {
-    id: 2,
-    name: 'كريم "أوبسيديان" الليلي',
-    category: 'عناية البشرة',
-    price: '180.00',
-    currency: 'ر.س',
-    image: '/store-cream.png',
-    isFeatured: false,
-  },
-  {
-    id: 3,
-    name: 'إكسير الشعر العضوي',
-    category: 'علاجات الشعر',
-    price: '95.00',
-    currency: 'ر.س',
-    image: '/store-elixir.png',
-    isFeatured: false,
-  },
-  {
-    id: 4,
-    name: 'مقشر الجسم البركاني',
-    category: 'عناية الجسم',
-    price: '110.00',
-    currency: 'ر.س',
-    image: '/store-scrub.png',
-    isFeatured: false,
-  },
-  {
-    id: 5,
-    name: 'عطر العود "سيجنتشر"',
-    category: 'العطور',
-    price: '320.00',
-    currency: 'ر.س',
-    image: '/store-perfume.png',
-    isFeatured: false,
-  },
-]
+export const StorePageClient: React.FC<Props> = ({ 
+  initialProducts, 
+  initialShippingZones,
+  initialCategories 
+}) => {
+  const [activeCategory, setActiveCategory] = useState('all')
+  const addItem = useCart((state) => state.addItem)
 
-export const StorePageClient: React.FC = () => {
-  const [activeCategory, setActiveCategory] = useState('جميع المنتجات')
+  const categories = [
+    { label: 'جميع المنتجات', value: 'all' },
+    ...initialCategories.map(cat => ({ label: cat.title, value: cat.id.toString() }))
+  ]
+
+  const filteredProducts = initialProducts.filter((product) => {
+    if (activeCategory === 'all') return true
+    // product.category is now a relationship (ID or Object)
+    const categoryId = typeof product.category === 'object' ? product.category.id : product.category
+    return categoryId?.toString() === activeCategory
+  })
+
+  const handleAddToCart = (product: Product) => {
+    const mainImage = product.imageGallery?.[0]?.image as Media
+    addItem({
+      id: product.id.toString(),
+      title: product.title,
+      price: product.salePrice || product.price,
+      quantity: 1,
+      image: mainImage?.url || '',
+    })
+    // Optional: Show a toast or feedback
+  }
 
   return (
     <div
@@ -92,18 +71,18 @@ export const StorePageClient: React.FC = () => {
               msOverflowStyle: 'none',
             }}
           >
-            {CATEGORIES.map((cat) => (
+            {categories.map((cat) => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                key={cat.value}
+                onClick={() => setActiveCategory(cat.value)}
                 className={`snap-start shrink-0 px-8 py-4 rounded-full text-sm font-semibold transition-colors ${
-                  activeCategory === cat
-                    ? 'bg-[#2a2a2a] text-[#ffffff]' // surface-container-high / primary
-                    : 'bg-[#1c1b1b] text-[#c4c9ac] hover:bg-[#353535]' // surface-container-low / on-surface-variant / hover:surface-variant
+                  activeCategory === cat.value
+                    ? 'bg-[#2a2a2a] text-[#ffffff]'
+                    : 'bg-[#1c1b1b] text-[#c4c9ac] hover:bg-[#353535]'
                 }`}
                 style={{ fontFamily: 'Inter, Noto Kufi Arabic, sans-serif' }}
               >
-                {cat}
+                {cat.label}
               </button>
             ))}
           </div>
@@ -112,17 +91,26 @@ export const StorePageClient: React.FC = () => {
         {/* Featured Products Grid */}
         <section className="w-full px-6 md:px-12 max-w-[1920px] mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 auto-rows-[450px]">
-            {PRODUCTS.map((product) => {
-              if (product.isFeatured) {
+            {filteredProducts.map((product) => {
+              const mainImage = product.imageGallery?.[0]?.image as Media
+              const categoryLabel = typeof product.category === 'object' 
+                ? product.category.title 
+                : (categories.find(c => c.value === product.category?.toString())?.label || 'منتج')
+
+              // Logic for "Featured" can be a flag in CMS, for now let's assume if it has salePrice it's prominent or just use first 2
+              // But the user didn't specify a featured flag in backend yet. I'll use index for visual variety.
+              const isProminent = product.stock > 10 // Example logic
+
+              if (isProminent) {
                 return (
                   <article
                     key={product.id}
                     className="col-span-1 md:col-span-2 lg:col-span-2 row-span-1 relative group rounded-xl overflow-hidden cursor-pointer flex flex-col justify-end p-8"
-                    style={{ background: '#353535' }} // surface-container-highest
+                    style={{ background: '#353535' }}
                   >
                     <Image
-                      src={product.image}
-                      alt={product.name}
+                      src={mainImage?.url || '/store-serum.png'}
+                      alt={product.title}
                       fill
                       className="absolute inset-0 object-cover opacity-60 group-hover:opacity-80 transition-all duration-700 group-hover:scale-105"
                     />
@@ -138,12 +126,12 @@ export const StorePageClient: React.FC = () => {
                           className="inline-block px-3 py-1 text-xs font-bold rounded-full mb-4"
                           style={{
                             fontFamily: 'Inter, Noto Kufi Arabic',
-                            background: 'rgba(233, 195, 73, 0.2)', // secondary/20
-                            color: '#e9c349', // secondary
+                            background: 'rgba(233, 195, 73, 0.2)',
+                            color: '#e9c349',
                             backdropFilter: 'blur(12px)',
                           }}
                         >
-                          {product.category}
+                          {categoryLabel}
                         </span>
                         <h2
                           className="text-3xl font-bold tracking-tight mb-2"
@@ -152,33 +140,36 @@ export const StorePageClient: React.FC = () => {
                             color: '#ffffff',
                           }}
                         >
-                          {product.name}
+                          {product.title}
                         </h2>
-                        <p
-                          className="text-sm max-w-md"
+                        <div
+                          className="text-sm max-w-md line-clamp-2"
                           style={{ color: '#c4c9ac', fontFamily: 'Noto Kufi Arabic' }}
                         >
-                          {product.description}
-                        </p>
+                           {/* Add description if needed, or excerpt */}
+                           {product.title} - تجربة تامر الفاخرة للعناية.
+                        </div>
                       </div>
                       <div className="text-left flex flex-row md:flex-col items-center md:items-start justify-between w-full md:w-auto">
                         <span
                           className="text-xl font-medium mb-0 md:mb-4"
                           style={{ fontFamily: 'Inter, Noto Kufi Arabic', color: '#ffffff' }}
                         >
-                          {product.price} {product.currency}
+                          {product.salePrice ? (
+                            <>
+                              <span className="line-through opacity-50 ml-2 text-sm">{product.price} ₪</span>
+                              <span>{product.salePrice} ₪</span>
+                            </>
+                          ) : (
+                            <span>{product.price} ₪</span>
+                          )}
                         </span>
                         <button
+                          onClick={() => handleAddToCart(product)}
                           className="w-12 h-12 rounded-full flex items-center justify-center transition-all duration-300"
                           style={{
-                            background: '#c3f400', // primary-fixed
-                            color: '#283500', // on-primary
-                          }}
-                          onMouseEnter={(e) => {
-                            e.currentTarget.style.boxShadow = '0 0 15px #c3f400'
-                          }}
-                          onMouseLeave={(e) => {
-                            e.currentTarget.style.boxShadow = 'none'
+                            background: '#c3f400',
+                            color: '#283500',
                           }}
                         >
                           <svg
@@ -202,21 +193,18 @@ export const StorePageClient: React.FC = () => {
                   key={product.id}
                   className="col-span-1 row-span-1 relative group rounded-xl overflow-hidden flex flex-col p-6"
                   style={{
-                    background: '#1c1b1b', // surface-container-low
-                    border: '1px solid rgba(68, 73, 51, 0.15)', // ghost-border
+                    background: '#1c1b1b',
+                    border: '1px solid rgba(68, 73, 51, 0.15)',
                   }}
                 >
-                  <div
-                    className="relative h-[60%] w-full rounded-lg overflow-hidden mb-6 flex items-center justify-center"
-                    style={{ background: '#0e0e0e' }} // surface-container-lowest
-                  >
+                  <Link href={`/products/${product.slug}`} className="relative h-[60%] w-full rounded-lg overflow-hidden mb-6 flex items-center justify-center" style={{ background: '#0e0e0e' }}>
                     <Image
-                      src={product.image}
-                      alt={product.name}
+                      src={mainImage?.url || '/store-serum.png'}
+                      alt={product.title}
                       fill
                       className="object-cover mix-blend-luminosity opacity-80 group-hover:scale-105 transition-transform duration-500"
                     />
-                  </div>
+                  </Link>
                   <div className="flex-grow flex flex-col justify-between">
                     <div>
                       <h3
@@ -226,26 +214,27 @@ export const StorePageClient: React.FC = () => {
                           color: '#ffffff',
                         }}
                       >
-                        {product.name}
+                        {product.title}
                       </h3>
                       <p
                         className="text-xs uppercase tracking-widest"
-                        style={{ fontFamily: 'Inter, Noto Kufi Arabic', color: '#c4c9ac' }} // on-surface-variant
+                        style={{ fontFamily: 'Inter, Noto Kufi Arabic', color: '#c4c9ac' }}
                       >
-                        {product.category}
+                        {categoryLabel}
                       </p>
                     </div>
                     <div
                       className="flex justify-between items-center mt-4 pt-4"
-                      style={{ borderTop: '1px solid rgba(68, 73, 51, 0.15)' }} // border-outline-variant/15
+                      style={{ borderTop: '1px solid rgba(68, 73, 51, 0.15)' }}
                     >
                       <span
                         className="text-lg"
                         style={{ fontFamily: 'Inter, Noto Kufi Arabic', color: '#ffffff' }}
                       >
-                        {product.price} {product.currency}
+                        {product.salePrice || product.price} ₪
                       </span>
                       <button
+                        onClick={() => handleAddToCart(product)}
                         className="text-sm font-bold transition-all duration-300"
                         style={{ fontFamily: 'Inter, Noto Kufi Arabic', color: '#c3f400' }}
                         onMouseEnter={(e) => {

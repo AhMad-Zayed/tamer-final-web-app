@@ -24,7 +24,7 @@ const collections: CollectionSlug[] = [
   'search',
 ]
 
-const globals: GlobalSlug[] = ['header', 'footer']
+const globals: GlobalSlug[] = ['header', 'footer', 'about']
 
 const categories = ['Technology', 'News', 'Finance', 'Design', 'Software', 'Engineering']
 
@@ -52,9 +52,7 @@ export const seed = async ({
     globals.map((global) =>
       payload.updateGlobal({
         slug: global,
-        data: {
-          navItems: [],
-        },
+        data: ((global === 'header' || global === 'footer') ? { navItems: [] } : {}) as any,
         depth: 0,
         context: {
           disableRevalidate: true,
@@ -180,6 +178,9 @@ export const seed = async ({
     data: {
       relatedPosts: [post2Doc.id, post3Doc.id],
     },
+    context: {
+      disableRevalidate: true,
+    },
   })
   await payload.update({
     id: post2Doc.id,
@@ -187,12 +188,18 @@ export const seed = async ({
     data: {
       relatedPosts: [post1Doc.id, post3Doc.id],
     },
+    context: {
+      disableRevalidate: true,
+    },
   })
   await payload.update({
     id: post3Doc.id,
     collection: 'posts',
     data: {
       relatedPosts: [post1Doc.id, post2Doc.id],
+    },
+    context: {
+      disableRevalidate: true,
     },
   })
 
@@ -202,22 +209,23 @@ export const seed = async ({
     collection: 'forms',
     depth: 0,
     data: contactFormData,
+    context: { disableRevalidate: true },
   })
 
   payload.logger.info(`— Seeding experts, services, offers, reviews...`)
-  const { expertsData, servicesData, offersData, reviewsData } = await import('./new-collections')
+  const { expertsData, servicesData, offersData, reviewsData, aboutData } = await import('./new-collections')
 
   const expertsDocs = await Promise.all(
-    expertsData.map((exp) => payload.create({ collection: 'experts', data: { ...exp, image: image2Doc.id } }))
+    expertsData.map((exp) => payload.create({ collection: 'experts', data: { ...exp, profileMedia: { ...exp.profileMedia, image: image2Doc.id } } as any, context: { disableRevalidate: true } }))
   )
   const servicesDocs = await Promise.all(
-    servicesData.map((srv) => payload.create({ collection: 'services', data: srv as any }))
+    servicesData.map((srv) => payload.create({ collection: 'services', data: srv as any, context: { disableRevalidate: true } }))
   )
   const offersDocs = await Promise.all(
-    offersData.map((off) => payload.create({ collection: 'offers', data: { ...off, image: image1Doc.id } }))
+    offersData.map((off) => payload.create({ collection: 'offers', data: { ...off, image: image1Doc.id }, context: { disableRevalidate: true } }))
   )
   const reviewsDocs = await Promise.all(
-    reviewsData.map((rev) => payload.create({ collection: 'reviews', data: rev as any }))
+    reviewsData.map((rev) => payload.create({ collection: 'reviews', data: rev as any, context: { disableRevalidate: true } }))
   )
 
   payload.logger.info(`— Seeding pages...`)
@@ -234,11 +242,13 @@ export const seed = async ({
         offersIds: offersDocs.map(o => o.id),
         reviewsIds: reviewsDocs.map(r => r.id),
       }),
+      context: { disableRevalidate: true },
     }),
     payload.create({
       collection: 'pages',
       depth: 0,
       data: contactPageData({ contactForm: contactForm }),
+      context: { disableRevalidate: true },
     }),
   ])
 
@@ -249,25 +259,27 @@ export const seed = async ({
       slug: 'header',
       data: {
         navItems: [
+          { link: { type: 'custom', label: 'الرئيسية', url: '/' } },
+          { link: { type: 'custom', label: 'من نحن', url: '/about' } },
           {
-            link: {
-              type: 'custom',
-              label: 'Posts',
-              url: '/posts',
-            },
+            link: { type: 'custom', label: 'الموظفون', url: '#' },
+            subItems: expertsDocs.map(exp => ({
+              link: { type: 'custom', label: exp.name, url: `/experts/${exp.slug}` }
+            }))
           },
-          {
-            link: {
-              type: 'reference',
-              label: 'Contact',
-              reference: {
-                relationTo: 'pages',
-                value: contactPage.id,
-              },
-            },
-          },
-        ],
-      },
+          { link: { type: 'custom', label: 'الخدمات', url: '/#services' } },
+          { link: { type: 'custom', label: 'العروض', url: '/#offers' } },
+        ] as any,
+      } as any,
+      context: { disableRevalidate: true },
+    }),
+    payload.updateGlobal({
+      slug: 'about',
+      data: {
+        ...aboutData,
+        tamerMedia: { ...aboutData.tamerMedia, image: imageHomeDoc.id }
+      } as any,
+      context: { disableRevalidate: true },
     }),
     payload.updateGlobal({
       slug: 'footer',
@@ -296,8 +308,9 @@ export const seed = async ({
               url: 'https://payloadcms.com/',
             },
           },
-        ],
-      },
+        ] as any,
+      } as any,
+      context: { disableRevalidate: true },
     }),
   ])
 
