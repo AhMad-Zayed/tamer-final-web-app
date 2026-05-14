@@ -81,6 +81,7 @@ export interface Config {
     orders: Order;
     'shipping-zones': ShippingZone;
     'product-categories': ProductCategory;
+    'wrapping-options': WrappingOption;
     redirects: Redirect;
     forms: Form;
     'form-submissions': FormSubmission;
@@ -112,6 +113,7 @@ export interface Config {
     orders: OrdersSelect<false> | OrdersSelect<true>;
     'shipping-zones': ShippingZonesSelect<false> | ShippingZonesSelect<true>;
     'product-categories': ProductCategoriesSelect<false> | ProductCategoriesSelect<true>;
+    'wrapping-options': WrappingOptionsSelect<false> | WrappingOptionsSelect<true>;
     redirects: RedirectsSelect<false> | RedirectsSelect<true>;
     forms: FormsSelect<false> | FormsSelect<true>;
     'form-submissions': FormSubmissionsSelect<false> | FormSubmissionsSelect<true>;
@@ -1284,7 +1286,14 @@ export interface Coupon {
   discountType: 'percentage' | 'fixed';
   value: number;
   expiryDate?: string | null;
+  /**
+   * اتركه فارغاً للاستخدام غير المحدود
+   */
   maxUses?: number | null;
+  /**
+   * يتم تحديثه تلقائياً عند كل طلب ناجح
+   */
+  usageCount?: number | null;
   active?: boolean | null;
   updatedAt: string;
   createdAt: string;
@@ -1315,11 +1324,18 @@ export interface Order {
     discount?: number | null;
     total: number;
   };
+  /**
+   * كود الكوبون الذي تم التحقق منه على الخادم
+   */
+  couponApplied?: string | null;
   gifting?: {
     isGift?: boolean | null;
     recipientName?: string | null;
     giftMessage?: string | null;
-    luxuryWrapping?: boolean | null;
+    /**
+     * خيار التغليف الذي اختاره العميل
+     */
+    luxuryWrapping?: (number | null) | WrappingOption;
   };
   payment: 'cod';
   updatedAt: string;
@@ -1335,6 +1351,50 @@ export interface ShippingZone {
   deliveryPrice: number;
   estimatedDeliveryTime?: string | null;
   active?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * خيارات التغليف الفاخر — الصق رابط الفيديو من Facebook أو YouTube وسيعمل تلقائياً.
+ *
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wrapping-options".
+ */
+export interface WrappingOption {
+  id: number;
+  name: string;
+  description?: string | null;
+  /**
+   * يضاف إلى إجمالي الطلب. اتركه 0 للتغليف المجاني.
+   */
+  price: number;
+  /**
+   * إيموجي يظهر على بطاقة التغليف في المتجر
+   */
+  emoji?: string | null;
+  active?: boolean | null;
+  /**
+   * رقم أقل = يظهر أولاً
+   */
+  sortOrder?: number | null;
+  /**
+   * اختر "رابط فيديو خارجي" ثم الصق الرابط مباشرة — بدون أكواد تضمين.
+   */
+  mediaType: 'image_gallery' | 'external_video';
+  /**
+   * أضف صوراً متعددة — ستظهر في سلايدر سلس عند الضغط على "معاينة".
+   */
+  gallery?:
+    | {
+        image: number | Media;
+        caption?: string | null;
+        id?: string | null;
+      }[]
+    | null;
+  /**
+   * ✅ الصق الرابط مباشرة من Facebook أو YouTube أو Vimeo. سيتم التحقق تلقائياً من أمان الرابط.
+   */
+  externalUrl?: string | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -1583,6 +1643,10 @@ export interface PayloadLockedDocument {
     | ({
         relationTo: 'product-categories';
         value: number | ProductCategory;
+      } | null)
+    | ({
+        relationTo: 'wrapping-options';
+        value: number | WrappingOption;
       } | null)
     | ({
         relationTo: 'redirects';
@@ -2291,6 +2355,7 @@ export interface CouponsSelect<T extends boolean = true> {
   value?: T;
   expiryDate?: T;
   maxUses?: T;
+  usageCount?: T;
   active?: T;
   updatedAt?: T;
   createdAt?: T;
@@ -2326,6 +2391,7 @@ export interface OrdersSelect<T extends boolean = true> {
         discount?: T;
         total?: T;
       };
+  couponApplied?: T;
   gifting?:
     | T
     | {
@@ -2358,6 +2424,29 @@ export interface ProductCategoriesSelect<T extends boolean = true> {
   title?: T;
   generateSlug?: T;
   slug?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "wrapping-options_select".
+ */
+export interface WrappingOptionsSelect<T extends boolean = true> {
+  name?: T;
+  description?: T;
+  price?: T;
+  emoji?: T;
+  active?: T;
+  sortOrder?: T;
+  mediaType?: T;
+  gallery?:
+    | T
+    | {
+        image?: T;
+        caption?: T;
+        id?: T;
+      };
+  externalUrl?: T;
   updatedAt?: T;
   createdAt?: T;
 }

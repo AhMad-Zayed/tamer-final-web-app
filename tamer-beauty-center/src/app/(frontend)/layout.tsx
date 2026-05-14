@@ -9,6 +9,7 @@ import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
 import { draftMode } from 'next/headers'
+import { Toaster } from 'sonner'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
@@ -47,6 +48,18 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           {children}
           <Footer />
           <FloatingCTAs />
+          <Toaster
+            position="top-right"
+            dir="rtl"
+            toastOptions={{
+              style: {
+                fontFamily: "'Noto Kufi Arabic', sans-serif",
+                direction: 'rtl',
+                textAlign: 'right',
+              },
+            }}
+            theme="dark"
+          />
         </Providers>
       </body>
     </html>

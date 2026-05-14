@@ -25,6 +25,7 @@ import { Coupons } from './collections/Coupons'
 import { Orders } from './collections/Orders'
 import { ShippingZones } from './collections/ShippingZones'
 import { ProductCategories } from './collections/ProductCategories'
+import { WrappingOptions } from './collections/WrappingOptions'
 
 const filename = fileURLToPath(import.meta.url)
 const dirname = path.dirname(filename)
@@ -68,6 +69,7 @@ export default buildConfig({
     Orders,
     ShippingZones,
     ProductCategories,
+    WrappingOptions,
   ],
   cors: [getServerSideURL()].filter(Boolean),
   globals: [Header, Footer, About],

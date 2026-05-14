@@ -29,7 +29,7 @@ export const ProductPageClient: React.FC<Props> = ({ product }) => {
       image: mainImage?.url || '',
       variant: selectedVariant ? {
         label: selectedVariant.label,
-        type: selectedVariant.type,
+        type: (selectedVariant.type as string) || '',
         additionalPrice: selectedVariant.additionalPrice || 0
       } : undefined
     })
@@ -90,7 +90,9 @@ export const ProductPageClient: React.FC<Props> = ({ product }) => {
               transition={{ delay: 0.2 }}
             >
               <span className="text-[#c3f400] text-sm font-bold tracking-widest uppercase mb-4 block">
-                {product.category}
+                {typeof product.category === 'object' && product.category !== null
+                  ? (product.category as any).title
+                  : ''}
               </span>
               <h1 className="text-5xl font-bold text-white mb-6 leading-tight" style={{ fontFamily: "'Epilogue', sans-serif" }}>
                 {product.title}

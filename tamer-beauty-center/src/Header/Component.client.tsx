@@ -18,11 +18,13 @@ interface HeaderClientProps {
 export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], services = [] }) => {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
-  const [cartOpen, setCartOpen] = useState(false)
   const [activeDropdown, setActiveDropdown] = useState<number | null>(null)
   const { setHeaderTheme } = useHeaderTheme()
   const pathname = usePathname()
   const cartItems = useCart((state) => state.items)
+  const isDrawerOpen = useCart((state) => state.isDrawerOpen)
+  const openDrawer = useCart((state) => state.openDrawer)
+  const closeDrawer = useCart((state) => state.closeDrawer)
 
   useEffect(() => {
     setHeaderTheme('dark')
@@ -34,11 +36,11 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Lock body scroll when mobile menu is open or cart is open
+  // Lock body scroll when mobile menu is open
   useEffect(() => {
-    document.body.style.overflow = (menuOpen || cartOpen) ? 'hidden' : ''
+    document.body.style.overflow = menuOpen ? 'hidden' : ''
     return () => { document.body.style.overflow = '' }
-  }, [menuOpen, cartOpen])
+  }, [menuOpen])
 
   // DYNAMIC FALLBACK NAV — always live from database
   const SERVICE_CATEGORIES = [
@@ -110,7 +112,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
             </a>
 
             <button
-              onClick={() => setCartOpen(true)}
+              onClick={openDrawer}
               className="relative p-2.5 rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-[#c3f400] transition-all hover:bg-white/10 group"
               aria-label="سلة التسوق"
             >
@@ -283,7 +285,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
           </div>
         </div>
       </div>
-      <CartDrawer isOpen={cartOpen} onClose={() => setCartOpen(false)} />
+      <CartDrawer isOpen={isDrawerOpen} onClose={closeDrawer} />
     </>
   )
 }

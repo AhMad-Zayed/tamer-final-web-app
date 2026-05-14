@@ -1,6 +1,8 @@
 import type { CollectionConfig } from 'payload'
 import { authenticated } from '../../access/authenticated'
 import { generateOrderNumber } from './hooks/generateOrderNumber'
+import { validateStock } from './hooks/validateStock'
+import { decrementStock } from './hooks/decrementStock'
 
 export const Orders: CollectionConfig = {
   slug: 'orders',
@@ -16,7 +18,8 @@ export const Orders: CollectionConfig = {
     delete: authenticated,
   },
   hooks: {
-    beforeChange: [generateOrderNumber],
+    beforeChange: [generateOrderNumber, validateStock],
+    afterChange: [decrementStock],
   },
   fields: [
     {
@@ -170,6 +173,16 @@ export const Orders: CollectionConfig = {
       ],
     },
     {
+      name: 'couponApplied',
+      label: 'كوبون الخصم المستخدم',
+      type: 'text',
+      admin: {
+        position: 'sidebar',
+        readOnly: true,
+        description: 'كود الكوبون الذي تم التحقق منه على الخادم',
+      },
+    },
+    {
       name: 'gifting',
       label: 'منطق الهدايا (Gifting)',
       type: 'group',
@@ -198,11 +211,12 @@ export const Orders: CollectionConfig = {
         },
         {
           name: 'luxuryWrapping',
-          label: 'تغليف فاخر (Luxury Wrapping)',
-          type: 'checkbox',
-          defaultValue: false,
+          label: 'خيار التغليف الملكي',
+          type: 'relationship',
+          relationTo: 'wrapping-options' as any,
           admin: {
             condition: (_, siblingData) => siblingData?.isGift,
+            description: 'خيار التغليف الذي اختاره العميل',
           },
         },
       ],
@@ -214,7 +228,7 @@ export const Orders: CollectionConfig = {
       defaultValue: 'cod',
       required: true,
       options: [
-        { label: 'الدفع عند الاستلام / في المركز', value: 'cod' },
+        { label: 'الدفع عند الاستلام أو في المركز', value: 'cod' },
       ],
       admin: {
         readOnly: true,

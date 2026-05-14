@@ -6,6 +6,7 @@ export const Coupons: CollectionConfig = {
   admin: {
     useAsTitle: 'code',
     group: 'المتجر (Store)',
+    defaultColumns: ['code', 'discountType', 'value', 'usageCount', 'active'],
   },
   access: {
     read: () => true, // Everyone can check if a coupon is valid
@@ -65,9 +66,20 @@ export const Coupons: CollectionConfig = {
           type: 'number',
           admin: {
             width: '50%',
+            description: 'اتركه فارغاً للاستخدام غير المحدود',
           },
         },
       ],
+    },
+    {
+      name: 'usageCount',
+      label: 'عدد مرات الاستخدام',
+      type: 'number',
+      defaultValue: 0,
+      admin: {
+        readOnly: true,
+        description: 'يتم تحديثه تلقائياً عند كل طلب ناجح',
+      },
     },
     {
       name: 'active',
