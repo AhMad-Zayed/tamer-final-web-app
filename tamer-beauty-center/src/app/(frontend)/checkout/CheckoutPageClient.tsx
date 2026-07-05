@@ -1,4 +1,4 @@
-﻿'use client'
+'use client'
 import React, { useState, useEffect } from 'react'
 import { useCart } from '@/providers/CartProvider/store'
 import type { ShippingZone } from '@/payload-types'
@@ -65,6 +65,7 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
         })),
         couponCode: couponInput.trim().toUpperCase(),
         shippingZoneId: String(formData.shippingZone),
+        incrementUsage: false,
       })
       if (!result.success) {
         setCouponError(result.error || 'كود الخصم غير صحيح')
@@ -98,6 +99,7 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
         })),
         couponCode: appliedCouponCode || undefined,
         shippingZoneId: String(formData.shippingZone),
+        incrementUsage: true,
       })
 
       if (!validation.success) {
@@ -111,10 +113,10 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
           name: formData.name,
           phone: formData.phone,
           shippingAddress: formData.shippingAddress,
-          shippingZone: formData.shippingZone,
+          shippingZone: isNaN(Number(formData.shippingZone)) ? formData.shippingZone : Number(formData.shippingZone),
         },
         items: items.map(item => ({
-          product: item.id,
+          product: isNaN(Number(item.id)) ? item.id : Number(item.id),
           quantity: item.quantity,
           priceAtPurchase: item.price + (item.variant?.additionalPrice || 0),
         })),
@@ -129,7 +131,9 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
           isGift: formData.isGift,
           recipientName: formData.recipientName,
           giftMessage: formData.giftMessage,
-          luxuryWrapping: selectedWrappingId || null,
+          luxuryWrapping: selectedWrappingId 
+            ? (isNaN(Number(selectedWrappingId)) ? selectedWrappingId : Number(selectedWrappingId))
+            : null,
         },
         payment: 'cod',
         status: 'pending',
@@ -149,7 +153,8 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
         setServerError(result.errors?.[0]?.message || 'فشل إرسال الطلب. يرجى المحاولة مجدداً.')
       }
     } catch (err: any) {
-      setServerError(err.message || 'حدث خطأ غير متوقع')
+      console.error('[Checkout] Submission Error:', err)
+      setServerError(err.message || 'حدث خطأ غير متوقع أثناء إرسال الطلب')
     } finally {
       setIsSubmitting(false)
     }

@@ -6,7 +6,11 @@ export const revalidateHeader: GlobalAfterChangeHook = ({ doc, req: { payload, c
   if (!context.disableRevalidate) {
     payload.logger.info(`Revalidating header`)
 
-    revalidateTag('global_header', 'max')
+    try {
+      revalidateTag('global_header', 'max')
+    } catch (err) {
+      payload.logger.error({ err }, `Error revalidating header`)
+    }
   }
 
   return doc

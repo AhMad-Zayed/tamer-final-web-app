@@ -29,7 +29,7 @@ export const ReviewsBlockComponent: React.FC<any> = ({ heading, reviews }) => {
                   ))}
                 </div>
                 <p className="text-lg text-neutral-300 leading-relaxed font-medium mb-8">
-                  "{review.text}"
+                  &quot;{review.text}&quot;
                 </p>
                 <div className="flex items-center gap-4 border-t border-white/5 pt-6">
                   <div className="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center font-bold text-xl text-white border border-white/10">

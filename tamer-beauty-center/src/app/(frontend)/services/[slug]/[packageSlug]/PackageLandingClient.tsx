@@ -63,7 +63,7 @@ export const PackageLandingClient: React.FC<Props> = ({ service, pkg }) => {
                    )}
                    {note && (
                      <p className="text-white/50 text-lg leading-relaxed max-w-xs font-light italic">
-                        "{note}"
+                        &quot;{note}&quot;
                      </p>
                    )}
                 </div>

@@ -53,6 +53,7 @@ export default buildConfig({
     pool: {
       connectionString: "postgresql://postgres:password123@127.0.0.1:5432/postgres",
     },
+    push: false,
   }),
   collections: [
     Pages,

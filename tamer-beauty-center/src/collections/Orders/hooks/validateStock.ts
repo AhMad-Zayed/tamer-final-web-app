@@ -15,7 +15,8 @@ export const validateStock: CollectionBeforeChangeHook = async ({
   for (const item of data.items) {
     if (!item.product || !item.quantity) continue
 
-    const productId = typeof item.product === 'object' ? item.product.id : item.product
+    const productIdRaw = typeof item.product === 'object' ? item.product.id : item.product
+    const productId = isNaN(Number(productIdRaw)) ? productIdRaw : Number(productIdRaw)
 
     try {
       const product = await payload.findByID({
