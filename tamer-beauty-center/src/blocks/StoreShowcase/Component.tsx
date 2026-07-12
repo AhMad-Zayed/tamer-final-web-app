@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { ShoppingBag, Gift, ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 
 export const StoreShowcaseBlock: React.FC<any> = ({ heading, subtitle, giftTitle, giftDesc, categories }) => {
   return (
@@ -26,10 +27,12 @@ export const StoreShowcaseBlock: React.FC<any> = ({ heading, subtitle, giftTitle
                   <div className="absolute inset-0 bg-black/30 group-hover:bg-black/10 transition-all duration-700 z-10" />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent z-10" />
                   {imgUrl && (
-                    <img
+                    <Image
                       src={imgUrl}
-                      className="absolute inset-0 w-full h-full object-cover grayscale brightness-[0.8] group-hover:scale-105 group-hover:grayscale-[20%] transition-all duration-700"
-                      alt={cat.name}
+                      fill
+                      className="absolute inset-0 object-cover grayscale brightness-[0.8] group-hover:scale-105 group-hover:grayscale-[20%] transition-all duration-700"
+                      alt={cat.name || 'منتج تامر بيوتي'}
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 25vw"
                     />
                   )}
                   <div className="absolute bottom-6 left-6 right-6 z-20 flex justify-between items-end">

@@ -31,9 +31,9 @@
   --breakpoint-lg: 64rem;
   --breakpoint-xl: 80rem;
   --breakpoint-2xl: 86rem;
-  --font-mono: 'Inter', monospace;
-  --font-sans: 'Noto Kufi Arabic', 'Manrope', sans-serif;
-  --font-display: 'Epilogue', 'Noto Kufi Arabic', sans-serif;
+  --font-mono: var(--font-inter), monospace;
+  --font-sans: var(--font-noto-kufi), var(--font-manrope), sans-serif;
+  --font-display: var(--font-noto-kufi), sans-serif;
 }
 
 body {
@@ -69,9 +69,9 @@ h1, h2, h3, h4, h5, h6 {
   --shadow-obsidian-deep: 0 25px 60px rgba(0,0,0,0.8), 0 8px 20px rgba(0,0,0,0.6);
   --shadow-glass: 0 8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
   --shadow-card-hover: 0 20px 60px rgba(0,0,0,0.9), 0 0 30px rgba(195,244,0,0.08);
-  --font-display: 'Noto Kufi Arabic', sans-serif;
-  --font-sans: 'Noto Kufi Arabic', sans-serif;
-  --font-mono: 'Inter', monospace;
+  --font-display: var(--font-noto-kufi), sans-serif;
+  --font-sans: var(--font-noto-kufi), sans-serif;
+  --font-mono: var(--font-inter), monospace;
 
   /* shadcn/ui compat */
   --color-card: #111111;
@@ -121,7 +121,7 @@ h1, h2, h3, h4, h5, h6 {
   body {
     background-color: #050505;
     color: #ffffff;
-    font-family: 'Noto Kufi Arabic', 'Manrope', sans-serif;
+    font-family: var(--font-noto-kufi), var(--font-manrope), sans-serif;
     -webkit-font-smoothing: antialiased;
     min-height: 100vh;
     display: flex;
@@ -130,10 +130,9 @@ h1, h2, h3, h4, h5, h6 {
   }
 
   h1, h2, h3, h4, h5, h6 {
-    font-family: 'Noto Kufi Arabic', sans-serif;
+    font-family: var(--font-noto-kufi), sans-serif;
     font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.1;
+    line-height: 1.4;
   }
 
   /* RTL scrollbar styling */
@@ -177,7 +176,7 @@ h1, h2, h3, h4, h5, h6 {
     gap: 0.5rem;
     background-color: #c3f400;
     color: #1a2600;
-    font-family: 'Noto Kufi Arabic', sans-serif;
+    font-family: var(--font-noto-kufi), sans-serif;
     font-weight: 700;
     font-size: 0.9375rem;
     padding: 0.75rem 1.75rem;
@@ -185,7 +184,6 @@ h1, h2, h3, h4, h5, h6 {
     border: none;
     cursor: pointer;
     transition: all 0.25s ease;
-    letter-spacing: -0.01em;
     white-space: nowrap;
   }
   .neon-button:hover {
@@ -205,7 +203,7 @@ h1, h2, h3, h4, h5, h6 {
     gap: 0.5rem;
     background: rgba(255,255,255,0.06);
     color: #ffffff;
-    font-family: 'Noto Kufi Arabic', sans-serif;
+    font-family: var(--font-noto-kufi), sans-serif;
     font-weight: 600;
     font-size: 0.9375rem;
     padding: 0.75rem 1.75rem;
@@ -228,7 +226,7 @@ h1, h2, h3, h4, h5, h6 {
     border-bottom: 1.5px solid rgba(255,255,255,0.15);
     outline: none;
     color: white;
-    font-family: 'Noto Kufi Arabic', sans-serif;
+    font-family: var(--font-noto-kufi), sans-serif;
     transition: border-color 0.3s ease;
     padding: 0.5rem 0;
   }
@@ -238,19 +236,16 @@ h1, h2, h3, h4, h5, h6 {
 
   /* Section layout helpers */
   .section-title {
-    font-family: 'Noto Kufi Arabic', sans-serif;
+    font-family: var(--font-noto-kufi), sans-serif;
     font-size: clamp(2rem, 5vw, 3.5rem);
     font-weight: 800;
-    letter-spacing: -0.03em;
-    line-height: 1.05;
+    line-height: 1.35;
     color: #ffffff;
   }
   .section-subtitle {
-    font-family: 'Noto Kufi Arabic', sans-serif;
+    font-family: var(--font-noto-kufi), sans-serif;
     font-size: 0.875rem;
     font-weight: 600;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
     color: #c3f400;
   }
 
@@ -327,6 +322,6 @@ h1, h2, h3, h4, h5, h6 {
   100% { transform: scale(1); }
 }
 @keyframes slide-in-rtl {
-  from { opacity: 0; transform: translateX(-40px); }
+  from { opacity: 0; transform: translateX(40px); }
   to { opacity: 1; transform: translateX(0); }
 }

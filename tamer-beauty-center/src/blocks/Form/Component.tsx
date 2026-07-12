@@ -103,7 +103,7 @@ export const FormBlock: React.FC<
           console.warn(err)
           setIsLoading(false)
           setError({
-            message: 'Something went wrong.',
+            message: 'حدث خطأ، يرجى المحاولة مجدداً.',
           })
         }
       }
@@ -123,8 +123,8 @@ export const FormBlock: React.FC<
           {!isLoading && hasSubmitted && confirmationType === 'message' && (
             <RichText data={confirmationMessage} />
           )}
-          {isLoading && !hasSubmitted && <p>Loading, please wait...</p>}
-          {error && <div>{`${error.status || '500'}: ${error.message || ''}`}</div>}
+          {isLoading && !hasSubmitted && <p>جارٍ التحميل...‏</p>}
+          {error && <div className="text-red-400 text-sm font-bold">{`خطأ ${error.status || '500'}: ${error.message || 'حدث خطأ، يرجى المحاولة مجدداً.'}`}</div>}
           {!hasSubmitted && (
             <form id={formID} onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-4 last:mb-0">

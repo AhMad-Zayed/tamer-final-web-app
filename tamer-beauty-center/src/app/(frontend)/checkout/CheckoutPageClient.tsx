@@ -8,6 +8,13 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { validateOrder } from '@/app/actions/validateOrder'
 import { WrappingSelector, type WrappingOption } from '@/components/WrappingSelector'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
 
 interface Props {
   shippingZones: ShippingZone[]
@@ -214,7 +221,7 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
           <div className="lg:col-span-7">
             <AnimatePresence mode="wait">
               {step === 1 ? (
-                <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                <motion.div key="step1" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-8">
                   {/* Cart Items */}
                   <div className="bg-[#131313] rounded-3xl p-8 border border-white/5">
                     <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
@@ -265,7 +272,7 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
                   </div>
                 </motion.div>
               ) : (
-                <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
+                <motion.div key="step2" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 20 }} className="space-y-8">
                   {/* Shipping Info */}
                   <div className="bg-[#131313] rounded-3xl p-8 border border-white/5">
                     <h2 className="text-2xl font-bold text-white mb-8 flex items-center gap-3">
@@ -287,15 +294,26 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
                       </div>
                       <div>
                         <label className="text-white/60 text-sm mb-2 block">منطقة التوصيل</label>
-                        <select value={formData.shippingZone}
-                          onChange={e => setFormData({ ...formData, shippingZone: e.target.value })}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 text-white focus:outline-none focus:border-[#c3f400]/50 appearance-none">
-                          {shippingZones.map(zone => (
-                            <option key={zone.id} value={zone.id} className="bg-[#131313]">
-                              {zone.name} ({zone.deliveryPrice} ₪)
-                            </option>
-                          ))}
-                        </select>
+                        <Select
+                          value={String(formData.shippingZone)}
+                          onValueChange={(val) => setFormData({ ...formData, shippingZone: val })}
+                          dir="rtl"
+                        >
+                          <SelectTrigger className="w-full bg-white/5 border border-white/10 rounded-xl px-6 py-4 h-auto text-white focus:ring-[#c3f400]/50 focus:border-[#c3f400]/50 focus-visible:ring-[#c3f400]/50">
+                            <SelectValue placeholder="اختر منطقة التوصيل" />
+                          </SelectTrigger>
+                          <SelectContent dir="rtl" className="bg-[#131313] border border-white/10 text-white">
+                            {shippingZones.map((zone) => (
+                              <SelectItem
+                                key={zone.id}
+                                value={String(zone.id)}
+                                className="text-white focus:bg-white/10 focus:text-white cursor-pointer"
+                              >
+                                {zone.name} ({zone.deliveryPrice} ₪)
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
                       </div>
                       <div>
                         <label className="text-white/60 text-sm mb-2 block">العنوان بالتفصيل</label>
@@ -339,7 +357,7 @@ export const CheckoutPageClient: React.FC<Props> = ({ shippingZones, wrappingOpt
                         <motion.div
                           layout
                           className="absolute top-1 w-5 h-5 rounded-full bg-white shadow-md"
-                          style={{ right: formData.isGift ? '4px' : '25px' }}
+                          style={{ left: formData.isGift ? '4px' : '25px' }}
                           transition={{ type: 'spring', stiffness: 500, damping: 30 }}
                         />
                       </button>

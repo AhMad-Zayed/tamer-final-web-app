@@ -149,9 +149,9 @@ export const CartDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                     <motion.div
                       key={`${item.id}-${item.variant?.label}`}
                       layout
-                      initial={{ opacity: 0, x: 30 }}
+                      initial={{ opacity: 0, x: -30 }}
                       animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20, height: 0, marginBottom: 0 }}
+                      exit={{ opacity: 0, x: 20, height: 0, marginBottom: 0 }}
                       transition={{ delay: index * 0.05 }}
                       className="group relative flex gap-4 p-4 rounded-2xl transition-all"
                       style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.05)' }}
@@ -193,7 +193,7 @@ export const CartDrawer: React.FC<{ isOpen: boolean; onClose: () => void }> = ({
                               className="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold mt-1.5 uppercase tracking-wider"
                               style={{ background: 'rgba(195,244,0,0.1)', color: '#c3f400' }}
                             >
-                              {item.variant.label}
+                              <span className="text-xs font-bold uppercase tracking-wider">{item.variant.label}</span>
                             </span>
                           )}
                         </div>

@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowRight } from 'lucide-react'
+import Image from 'next/image'
 
 import type { Page } from '@/payload-types'
 
@@ -10,8 +11,33 @@ export const HeroSlider: React.FC<Page['hero']> = ({ slides }) => {
 
   useEffect(() => {
     if (!slides || slides.length === 0) return
-    const timer = setInterval(() => setCurrentSlide((prev) => (prev + 1) % slides.length), 7000)
-    return () => clearInterval(timer)
+
+    let timer: ReturnType<typeof setInterval> | null = null
+
+    const start = () => {
+      if (timer) return
+      timer = setInterval(() => setCurrentSlide((prev) => (prev + 1) % slides.length), 7000)
+    }
+
+    const stop = () => {
+      if (timer) {
+        clearInterval(timer)
+        timer = null
+      }
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.hidden) stop()
+      else start()
+    }
+
+    start()
+    document.addEventListener('visibilitychange', handleVisibilityChange)
+
+    return () => {
+      stop()
+      document.removeEventListener('visibilitychange', handleVisibilityChange)
+    }
   }, [slides])
 
   if (!slides || slides.length === 0) return null
@@ -32,13 +58,16 @@ export const HeroSlider: React.FC<Page['hero']> = ({ slides }) => {
           className="absolute inset-0"
         >
           {imgUrl && (
-            <img
+            <Image
               src={imgUrl}
-              className="w-full h-full object-cover grayscale brightness-[0.25]"
-              alt={activeSlide.title || 'Hero'}
+              fill
+              className="object-cover grayscale brightness-[0.25]"
+              alt={activeSlide.title || 'تامر بيوتي سنتر'}
+              priority
+              sizes="100vw"
             />
           )}
-          <div className="absolute inset-0 bg-gradient-to-l from-black via-black/40 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/40 to-transparent" />
           <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent" />
         </motion.div>
       </AnimatePresence>
@@ -46,7 +75,7 @@ export const HeroSlider: React.FC<Page['hero']> = ({ slides }) => {
       <div className="container mx-auto px-6 relative z-10">
         <motion.div
           key={`text-${currentSlide}`}
-          initial={{ opacity: 0, x: 50 }}
+          initial={{ opacity: 0, x: -50 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 1.5, delay: 0.4 }}
         >
@@ -80,7 +109,7 @@ export const HeroSlider: React.FC<Page['hero']> = ({ slides }) => {
             className={`h-1.5 transition-all duration-700 ${
               currentSlide === i ? 'w-32 bg-[#c3f400]' : 'w-12 bg-white/10'
             }`}
-            aria-label={`Go to slide ${i + 1}`}
+            aria-label={`انتقل إلى الشريحة ${i + 1}`}
           />
         ))}
       </div>

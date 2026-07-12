@@ -25,7 +25,7 @@ export const FloatingCTAs: React.FC = () => {
       className="fixed z-50 flex flex-col items-center gap-3"
       style={{
         bottom: '1.5rem',
-        left: '1.5rem', // LTR left = RTL visual left (actually right side in RTL)
+        right: '1.5rem', // RTL: أزرار التواصل في الجهة اليمنى من الشاشة
         opacity: visible ? 1 : 0,
         transform: visible ? 'translateY(0)' : 'translateY(20px)',
         transition: 'opacity 0.5s ease, transform 0.5s ease',

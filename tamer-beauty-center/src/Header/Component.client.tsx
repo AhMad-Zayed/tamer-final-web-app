@@ -2,17 +2,46 @@
 import { useHeaderTheme } from '@/providers/HeaderTheme'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { ShoppingBag } from 'lucide-react'
 import { useCart } from '@/providers/CartProvider/store'
 import { CartDrawer } from '@/components/CartDrawer'
 
 import type { Header } from '@/payload-types'
 
+interface Expert {
+  name: string
+  slug?: string | null
+}
+
+interface Service {
+  category?: string | null
+  slug?: string | null
+}
+
+interface NavSubItem {
+  link: {
+    type: string
+    label: string
+    url: string
+    reference?: { value?: { slug?: string } } | null
+  }
+}
+
+interface NavItem {
+  link: {
+    type: string
+    label: string
+    url: string
+    reference?: { value?: { slug?: string } } | null
+  }
+  subItems: NavSubItem[]
+}
+
 interface HeaderClientProps {
   data: Header
-  experts?: any[]
-  services?: any[]
+  experts?: Expert[]
+  services?: Service[]
 }
 
 export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], services = [] }) => {
@@ -25,6 +54,8 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
   const isDrawerOpen = useCart((state) => state.isDrawerOpen)
   const openDrawer = useCart((state) => state.openDrawer)
   const closeDrawer = useCart((state) => state.closeDrawer)
+  const hamburgerRef = useRef<HTMLButtonElement>(null)
+  const drawerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     setHeaderTheme('dark')
@@ -42,6 +73,33 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
     return () => { document.body.style.overflow = '' }
   }, [menuOpen])
 
+  // Focus trap for mobile menu accessibility
+  useEffect(() => {
+    if (!menuOpen) return
+    const drawer = drawerRef.current
+    if (!drawer) return
+    const focusableSelectors = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+    const focusable = Array.from(drawer.querySelectorAll<HTMLElement>(focusableSelectors))
+    if (focusable.length > 0) focusable[0]?.focus()
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setMenuOpen(false)
+        hamburgerRef.current?.focus()
+        return
+      }
+      if (e.key !== 'Tab') return
+      const first = focusable[0]
+      const last = focusable[focusable.length - 1]
+      if (e.shiftKey) {
+        if (document.activeElement === first) { e.preventDefault(); last?.focus() }
+      } else {
+        if (document.activeElement === last) { e.preventDefault(); first?.focus() }
+      }
+    }
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [menuOpen])
+
   // DYNAMIC FALLBACK NAV — always live from database
   const SERVICE_CATEGORIES = [
     { label: 'إزالة الشعر بالليزر', value: 'laser',    slug: 'laser-hair-removal' },
@@ -54,7 +112,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
   // Build services sub-items from DB or fallback to static slugs
   const serviceSubItems = SERVICE_CATEGORIES.map(cat => {
     const dbSvc = services.find(s => s.category === cat.value)
-    return { label: cat.label, href: `/services/${dbSvc?.slug || cat.slug}` }
+    return { label: cat.label, href: `/services/${dbSvc?.slug ?? cat.slug}` }
   })
 
   const dynamicNavItems = [
@@ -65,18 +123,18 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
     { label: 'المتجر', href: '/store' },
     { label: 'اتصل بنا', href: '/contact' },
     { 
-      label: 'الموظفون', 
+      label: 'خبراؤنا', 
       href: '#',
       subItems: experts.map(exp => ({
         label: exp.name,
-        href: `/experts/${exp.slug}`
+        href: `/experts/${exp.slug ?? ''}`
       }))
     },
   ]
 
-  const navItemsToUse = dynamicNavItems.map(item => ({ 
+  const navItemsToUse: NavItem[] = dynamicNavItems.map(item => ({ 
     link: { type: 'custom', label: item.label, url: item.href }, 
-    subItems: item.subItems ? item.subItems.map((sub: any) => ({ link: { type: 'custom', label: sub.label, url: sub.href } })) : [] 
+    subItems: item.subItems ? item.subItems.map((sub) => ({ link: { type: 'custom', label: sub.label, url: sub.href } })) : [] 
   }))
 
   return (
@@ -118,7 +176,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
             >
               <ShoppingBag size={20} />
               {cartItems.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-5 h-5 bg-[#c3f400] text-[#283500] text-[10px] font-bold rounded-full flex items-center justify-center border-2 border-[#131313] group-hover:scale-110 transition-transform">
+                <span className="absolute -top-1 -left-1 w-5 h-5 bg-[#c3f400] text-[#283500] text-xs font-bold rounded-full flex items-center justify-center border-2 border-[#131313] group-hover:scale-110 transition-transform">
                   {cartItems.length}
                 </span>
               )}
@@ -127,7 +185,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
 
           {/* ── Desktop Nav ── */}
           <nav className="hidden md:flex items-center gap-8" dir="rtl" aria-label="القائمة الرئيسية">
-            {navItemsToUse.map((item: any, index: number) => {
+            {navItemsToUse.map((item: NavItem, index: number) => {
               const hasSubItems = item.subItems && item.subItems.length > 0
               
               return (
@@ -143,7 +201,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
                   >
                     {item.link?.label}
                     {hasSubItems && (
-                      <span className={`text-[10px] transition-transform duration-300 ${activeDropdown === index ? 'rotate-180' : ''}`}>▼</span>
+                      <span className={`text-xs transition-transform duration-300 ${activeDropdown === index ? 'rotate-180' : ''}`}>▼</span>
                     )}
                     <span
                       className="absolute -bottom-1 right-0 w-0 h-[1.5px] bg-[#c3f400] group-hover:w-full transition-all duration-300"
@@ -155,7 +213,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
                   {hasSubItems && activeDropdown === index && (
                     <div className="absolute top-[80%] right-0 mt-2 w-56 pt-2 z-50">
                        <div className="bg-[#121212] border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-xl">
-                          {item.subItems.map((sub: any, i: number) => (
+                          {item.subItems.map((sub: NavSubItem, i: number) => (
                             <Link
                               key={i}
                               href={sub.link?.url || sub.link?.reference?.value?.slug || '#'}
@@ -190,6 +248,7 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
 
           {/* ── Mobile: Hamburger ── */}
           <button
+            ref={hamburgerRef}
             className="md:hidden flex flex-col items-center justify-center w-10 h-10 gap-1.5 rounded-xl"
             style={{ background: 'rgba(255,255,255,0.06)' }}
             onClick={() => setMenuOpen(!menuOpen)}
@@ -230,7 +289,11 @@ export const HeaderClient: React.FC<HeaderClientProps> = ({ data, experts = [], 
 
         {/* Drawer panel */}
         <div
+          ref={drawerRef}
           className="absolute inset-y-0 right-0 w-full max-w-xs flex flex-col pt-24 pb-8 px-8 overflow-y-auto"
+          role="dialog"
+          aria-modal="true"
+          aria-label="قائمة التنقل"
           style={{
             background: 'rgba(10,10,10,0.98)',
             boxShadow: '-8px 0 32px rgba(0,0,0,0.8)',
